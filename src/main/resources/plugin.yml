@@ -1,0 +1,9 @@
+name: StrengthSMP
+version: '0.0.1'
+main: com.myst1cs04p.strength_smp.Main
+api-version: 1.16
+commands:
+  strength:
+    description: Checks your strength
+    aliases: [str]
+    usage: /strength|str

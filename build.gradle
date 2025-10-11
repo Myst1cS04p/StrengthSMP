@@ -1,0 +1,18 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.myst1cs04p.strength_smp'
+version = '0.0.1'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'papermc'
+        url = 'https://repo.papermc.io/repository/maven-public/'
+    }
+}
+
+dependencies {
+    compileOnly 'io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT'
+}
