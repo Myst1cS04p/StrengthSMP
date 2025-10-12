@@ -54,6 +54,7 @@ strength-item:
 # Permissions
 - `strength.get` — Allows you to view other player's strength (default: op)
 - `strength.set` — Allows you to set any player's strength (default: op)
+- `strength.reload` — Allows you to reload the config (default: op)
 
 # API/Integration
 Other plugins can hook into the system via:
