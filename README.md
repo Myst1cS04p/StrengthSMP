@@ -69,3 +69,5 @@ manager.setStrength(player, newAmount);
 - Author: Myst1cS04p(me)
 - Contributors: ChatGPT(the goat)
 - License: MIT(who really even cares lol?)
+
+  `note for anyone that attempts to modify the plugin: my code is kinda buns, so gl with that.`
