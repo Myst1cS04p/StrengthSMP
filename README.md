@@ -28,6 +28,7 @@
 - `/strength set <player> <amount>` — (OP only) Manually set someone’s strength.
 - `/strength withdraw <amount>` — Convert part of your strength into tradable tokens.
 - `/strength reload` — Reload config without restarting.
+- `/strength version` — Displays plugin version.
 
 ## Offline tracking
 - Player data persists even when they’re offline.
