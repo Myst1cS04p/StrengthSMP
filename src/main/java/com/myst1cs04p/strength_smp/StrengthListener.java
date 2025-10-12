@@ -4,7 +4,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -41,21 +40,8 @@ public class StrengthListener implements Listener {
             manager.increaseStrength(killer);
         } else {
             // Drop a "strength item" (can customize this)
-            ItemStack strengthToken = new ItemStack(Material.BLAZE_POWDER, 1);
-            killer.getWorld().dropItemNaturally(killer.getLocation(), strengthToken);
+            ItemStack strengthToken = StrengthItem.createStrengthToken();
+            killer.getWorld().dropItemNaturally(victim.getLocation(), strengthToken);
         }
-    }
-
-    @EventHandler
-    public void onDamage(EntityDamageByEntityEvent event) {
-        if (!(event.getDamager() instanceof Player)) return;
-
-        Player damager = (Player) event.getDamager();
-        int strength = manager.getStrength(damager);
-
-        // Custom damage multiplier (e.g., +0.5 per strength)
-        double baseDamage = event.getDamage();
-        double newDamage = baseDamage + (strength * manager.getDamageMultiplier()); // Adjust scaling as needed
-        event.setDamage(newDamage);
     }
 }

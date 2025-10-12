@@ -1,4 +1,19 @@
 min-strength: -3
 max-strength: 5
-
 damage-multiplier: 0.3
+
+strength-item:
+  enabled: true
+  recipe:
+    key: strength_token
+    # 3x3 shape — each string is a row with single-character keys
+    shape:
+      - "ABA"
+      - "BCB"
+      - "ADA"
+    # Map characters used in shape to materials
+    # Characters used above: A, B, C, D
+    A: DIAMOND
+    B: BLAZE_POWDER
+    C: NETHER_STAR
+    D: BLAZE_ROD

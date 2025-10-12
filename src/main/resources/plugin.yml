@@ -1,9 +1,20 @@
 name: StrengthSMP
-version: '0.0.1'
+version: '1.0'
 main: com.myst1cs04p.strength_smp.Main
 api-version: 1.16
 commands:
   strength:
-    description: Checks your strength
+    description: View or set strength
     aliases: [str]
-    usage: /strength|str
+    usage: /<command> get|set|withdraw|help
+
+permissions:
+  strength.set:
+    description: Allows setting player strength.
+    default: op
+  strength.get:
+    description: Allows viewing strengths of players other than yourself
+    default: op
+  strength.reload:
+    description: Reloads the plugin. Updates the plugin values to match the config.
+    default: op
