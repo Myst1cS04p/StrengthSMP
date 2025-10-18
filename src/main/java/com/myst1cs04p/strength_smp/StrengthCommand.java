@@ -55,11 +55,11 @@ public class StrengthCommand implements CommandExecutor, TabCompleter {
 
                 if (sender.hasPermission("strength.get")) {
                     sender.sendMessage(Component.text("/" + label, NamedTextColor.AQUA)
-                            .append(Component.text(" check [player]", NamedTextColor.WHITE))
+                            .append(Component.text(" get [player]", NamedTextColor.WHITE))
                             .append(Component.text(" - check someone else's", NamedTextColor.WHITE)));
                 } else {
                     sender.sendMessage(Component.text("/" + label, NamedTextColor.AQUA)
-                            .append(Component.text(" check", NamedTextColor.WHITE)));
+                            .append(Component.text(" get", NamedTextColor.AQUA)));
                 }
 
                 if(sender.hasPermission("strength.set")){
@@ -87,13 +87,18 @@ public class StrengthCommand implements CommandExecutor, TabCompleter {
             case "get" -> {
                 if (args.length == 1) {
                     if (!(sender instanceof Player p)) {
-                        sender.sendMessage(Component.text("Specify a player gng",NamedTextColor.RED));
+                        sender.sendMessage(Component.text("cant run ts from console gng",NamedTextColor.RED));
                         return true;
                     }
-                    sender.sendMessage(Component.text("[Strength] ", NamedTextColor.GRAY)
+                    sender.sendMessage(Component.text("[Strength] ", NamedTextColor.RED)
                         .append(Component.text("Your strength: ", NamedTextColor.GREEN))
                         .append(Component.text(manager.getStrength(p), NamedTextColor.GOLD)));
                     return true;
+                }
+                
+                if(!sender.hasPermission("strength.get")){
+                    sender.sendMessage(Component.text("You dont have perms to check other ppl's strength.", NamedTextColor.RED));
+                    return false;
                 }
 
                 Player target = Bukkit.getPlayer(args[1]);
@@ -102,7 +107,7 @@ public class StrengthCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
 
-                sender.sendMessage(Component.text("[Strength] ", NamedTextColor.GRAY)
+                sender.sendMessage(Component.text("[Strength] ", NamedTextColor.RED)
                     .append(Component.text(target.getName() + "'s strength: ", NamedTextColor.GREEN))
                     .append(Component.text(manager.getStrength(target), NamedTextColor.GOLD)));
                 return true;
