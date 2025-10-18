@@ -1,6 +1,5 @@
 package com.myst1cs04p.strength_smp;
 
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
