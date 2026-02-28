@@ -1,0 +1,22 @@
+loader: com.myst1cs04p.strength_smp.paper.PaperMain
+main: com.myst1cs04p.strength_smp.paper.PaperMain
+name: StrengthSMP
+version: '${version}'
+api-version: '1.21'
+description: Strength SMP plugin - players gain and lose strength on PvP kills.
+authors:
+  - Myst1cS04p
+
+permissions:
+  strength.set:
+    description: Allows setting player strength.
+    default: op
+  strength.get:
+    description: Allows viewing other players' strength.
+    default: op
+  strength.reload:
+    description: Reloads the plugin config.
+    default: op
+  strength.admin:
+    description: Receives update nag messages on join and scheduled broadcasts.
+    default: op

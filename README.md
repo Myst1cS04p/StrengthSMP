@@ -24,11 +24,11 @@
 - Killing a player at max strength drops a strength token instead of wasting the strength.
 
 ## Commands for mortals and gods
-- `/strength get` — See your current strength level.
-- `/strength set <player> <amount>` — (OP only) Manually set someone’s strength.
-- `/strength withdraw <amount>` — Convert part of your strength into tradable tokens.
-- `/strength reload` — Reload config without restarting.
-- `/strength version` — Displays plugin version.
+- `/strength get` - See your current strength level.
+- `/strength set <player> <amount>` - (OP only) Manually set someone’s strength.
+- `/strength withdraw <amount>` - Convert part of your strength into tradable tokens.
+- `/strength reload` - Reload config without restarting.
+- `/strength version` - Displays plugin version.
 
 ## Offline tracking
 - Player data persists even when they’re offline.
@@ -53,9 +53,9 @@ strength-item:
     D: BLAZE_ROD
 ```
 # Permissions
-- `strength.get` — Allows you to view other player's strength (default: op)
-- `strength.set` — Allows you to set any player's strength (default: op)
-- `strength.reload` — Allows you to reload the config (default: op)
+- `strength.get` - Allows you to view other player's strength (default: op)
+- `strength.set` - Allows you to set any player's strength (default: op)
+- `strength.reload` - Allows you to reload the config (default: op)
 
 # API/Integration
 Other plugins can hook into the system via:
@@ -73,3 +73,4 @@ manager.setStrength(player, newAmount);
 - License: MIT(who really even cares lol?)
 
 `note for anyone that attempts to modify the plugin: my code is kinda buns, so gl with that.`
+also, you can check me out [here](https://myst1cs04p.github.io/)
