@@ -75,7 +75,15 @@ public class BukkitPlatform implements StrengthPlatform {
 
     @Override
     public void broadcastMessage(Component message) {
-        Bukkit.getServer().sendMessage(message);
+        // Send to every online player
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.sendMessage(message);
+        }
+        // Also log a plain-text version to console
+        Bukkit.getConsoleSender().sendMessage(
+            net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+                .legacySection().serialize(message)
+        );
     }
 
     @Override
@@ -95,7 +103,6 @@ public class BukkitPlatform implements StrengthPlatform {
         if (player instanceof BukkitStrengthPlayer bsp) {
             return bsp.getHandle();
         }
-        // Fallback: resolve by UUID (slower path, shouldn't happen in normal flow)
         return Bukkit.getPlayer(player.getUniqueId());
     }
 }

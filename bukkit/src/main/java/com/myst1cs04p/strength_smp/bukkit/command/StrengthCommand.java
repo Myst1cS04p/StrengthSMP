@@ -4,7 +4,7 @@ import com.myst1cs04p.strength_smp.bukkit.BukkitStrengthPlayer;
 import com.myst1cs04p.strength_smp.common.command.StrengthCommandLogic;
 import com.myst1cs04p.strength_smp.common.model.StrengthPlayer;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -35,8 +35,6 @@ public class StrengthCommand implements CommandExecutor, TabCompleter {
         if (sender instanceof Player player) {
             logic.execute(new BukkitStrengthPlayer(player), false, label, args);
         } else {
-            // Console sender: pass null StrengthPlayer, isConsole = true
-            // Common logic routes console-appropriate responses back via the console path
             logic.execute(new ConsoleSenderAdapter(sender), true, label, args);
         }
         return true;
@@ -68,7 +66,7 @@ public class StrengthCommand implements CommandExecutor, TabCompleter {
     }
 
     // -----------------------------------------------------------------------
-    // Console adapter = wraps CommandSender as a StrengthPlayer so common logic
+    // Console adapter - wraps CommandSender as a StrengthPlayer so common logic
     // can call sendMessage on it uniformly.
     // -----------------------------------------------------------------------
 
@@ -76,7 +74,7 @@ public class StrengthCommand implements CommandExecutor, TabCompleter {
 
         @Override
         public java.util.UUID getUniqueId() {
-            return new java.util.UUID(0, 0); // console has no UUID
+            return new java.util.UUID(0, 0); 
         }
 
         @Override
@@ -86,8 +84,7 @@ public class StrengthCommand implements CommandExecutor, TabCompleter {
 
         @Override
         public void sendMessage(Component message) {
-            // Serialize Component to plain text for console
-            sender.sendMessage(PlainTextComponentSerializer.plainText().serialize(message));
+            sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(message));
         }
 
         @Override
@@ -97,7 +94,7 @@ public class StrengthCommand implements CommandExecutor, TabCompleter {
 
         @Override
         public boolean isOp() {
-            return true; // console is always op
+            return true;
         }
     }
 }

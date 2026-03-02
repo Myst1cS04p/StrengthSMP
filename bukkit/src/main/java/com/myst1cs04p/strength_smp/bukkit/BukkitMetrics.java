@@ -15,15 +15,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  * bStats integration. Registers custom charts and implements the
  * {@link StrengthMetrics} interface so common logic can record events
  * without knowing bStats exists.
- *
- * Plugin ID: register at https://bstats.org/plugin/bukkit and replace PLUGIN_ID.
  */
 public class BukkitMetrics implements StrengthMetrics {
 
-    // TODO: Replace with your real bStats plugin ID after registering at bstats.org
-    private static final int PLUGIN_ID = 00000;
+    private static final int PLUGIN_ID = 29827;
 
-    // Counters - read periodically by bStats chart callbacks
     private final AtomicInteger tokensConsumed  = new AtomicInteger(0);
     private final AtomicInteger tokensDropped   = new AtomicInteger(0);
     private final AtomicInteger totalWithdrawn  = new AtomicInteger(0);
@@ -32,8 +28,12 @@ public class BukkitMetrics implements StrengthMetrics {
     private final Map<String, AtomicInteger> strengthDistribution = new HashMap<>();
 
     public BukkitMetrics(JavaPlugin plugin) {
-        Metrics metrics = new Metrics(plugin, PLUGIN_ID);
-        registerCharts(metrics);
+        try {
+            Metrics metrics = new Metrics(plugin, PLUGIN_ID);
+            registerCharts(metrics);
+        } catch (Exception e) {
+            plugin.getLogger().warning("[StrengthSMP] bStats failed to initialise (invalid plugin ID?). Metrics disabled. " + e.getMessage());
+        }
     }
 
     private void registerCharts(Metrics metrics) {
@@ -67,7 +67,7 @@ public class BukkitMetrics implements StrengthMetrics {
     }
 
     // -----------------------------------------------------------------------
-    // StrengthMetrics impl
+    // StrengthMetrics Implementation
     // -----------------------------------------------------------------------
 
     @Override

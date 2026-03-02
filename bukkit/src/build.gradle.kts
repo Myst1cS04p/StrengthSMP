@@ -13,23 +13,27 @@ repositories {
 dependencies {
     implementation(project(":common"))
 
-    // bStats = single artifact, shaded + relocated
     implementation("org.bstats:bstats-bukkit:3.1.0")
 
     compileOnly("org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT")
 
-    // Adventure API pulled transitively through Spigot but declared explicitly for compilation
     compileOnly("net.kyori:adventure-api:4.17.0")
+
+    compileOnly("net.kyori:adventure-text-serializer-legacy:4.17.0")
+}
+
+tasks.processResources {
+    filesMatching("*.yml") {
+        expand("version" to project.version)
+    }
 }
 
 tasks.withType<ShadowJar> {
     archiveClassifier.set("")
     archiveBaseName.set("strengthsmp-bukkit")
 
-    // Relocate bStats so it doesn't conflict with other plugins
     relocate("org.bstats", "com.myst1cs04p.strength_smp.libs.bstats")
 
-    // Relocate Gson since Bukkit ships its own version
     relocate("com.google.gson", "com.myst1cs04p.strength_smp.libs.gson")
 
     dependencies {

@@ -1,7 +1,6 @@
 package com.myst1cs04p.strength_smp.paper.scheduler;
 
 import com.myst1cs04p.strength_smp.common.updater.VersionNotifier;
-import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.concurrent.TimeUnit;
@@ -19,7 +18,7 @@ public class PaperUpdateScheduler {
 
     private final JavaPlugin plugin;
     private final VersionNotifier notifier;
-    private ScheduledTask task;
+    private Object task; 
 
     public PaperUpdateScheduler(JavaPlugin plugin, VersionNotifier notifier) {
         this.plugin = plugin;
@@ -40,11 +39,11 @@ public class PaperUpdateScheduler {
     }
 
     /**
-     * Cancel the task cleanly (call from onDisable if needed).
+     * Cancel the task cleanly on plugin disable.
      */
     public void stop() {
-        if (task != null) {
-            task.cancel();
+        if (task instanceof io.papermc.paper.scheduler.ScheduledTask scheduledTask) {
+            scheduledTask.cancel();
         }
     }
 }

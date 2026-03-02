@@ -2,6 +2,7 @@ package com.myst1cs04p.strength_smp.bukkit;
 
 import com.myst1cs04p.strength_smp.bukkit.command.StrengthCommand;
 import com.myst1cs04p.strength_smp.bukkit.listener.AdminJoinListener;
+import com.myst1cs04p.strength_smp.bukkit.listener.PlayerConnectionListener;
 import com.myst1cs04p.strength_smp.bukkit.listener.StrengthItemListener;
 import com.myst1cs04p.strength_smp.bukkit.listener.StrengthListener;
 import com.myst1cs04p.strength_smp.bukkit.recipe.RecipeRegistrar;
@@ -65,6 +66,7 @@ public class BukkitMain extends JavaPlugin {
 
         // Events
         var pm = getServer().getPluginManager();
+        pm.registerEvents(new PlayerConnectionListener(engine), this);
         pm.registerEvents(new StrengthListener(engine), this);
         pm.registerEvents(new StrengthItemListener(engine), this);
 
@@ -72,7 +74,7 @@ public class BukkitMain extends JavaPlugin {
         recipeRegistrar = new RecipeRegistrar(this);
         recipeRegistrar.register(config);
 
-        // Version notifier - scheduler is overridden by Paper
+        // Version notifier
         versionNotifier = new VersionNotifier(
             getLogger(),
             "Myst1cS04p",
@@ -104,7 +106,7 @@ public class BukkitMain extends JavaPlugin {
     }
 
     // -----------------------------------------------------------------------
-    // Scheduler hook - Paper overrides this
+    // Scheduler hook
     // -----------------------------------------------------------------------
 
     /**
@@ -120,13 +122,47 @@ public class BukkitMain extends JavaPlugin {
     // -----------------------------------------------------------------------
 
     private void printBanner() {
-        getLogger().info("\n\u001B[31m" +
-                "███████╗████████╗██████╗ ███████╗███╗   ██╗ ██████╗████████╗██╗  ██╗\r\n" +
-                "██╔════╝╚══██╔══╝██╔══██╗██╔════╝████╗  ██║██╔════╝╚══██╔══╝██║  ██║\r\n" +
-                "███████╗   ██║   ██████╔╝█████╗  ██╔██╗ ██║██║  ███╗  ██║   ███████║\r\n" +
-                "╚════██║   ██║   ██╔══██╗██╔══╝  ██║╚██╗██║██║   ██║  ██║   ██╔══██║\r\n" +
-                "███████║   ██║   ██║  ██║███████╗██║ ╚████║╚██████╔╝  ██║   ██║  ██║\r\n" +
-                "╚══════╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝ ╚═════╝   ╚═╝   ╚═╝  ╚═╝\u001B[0m");
-        getLogger().info("[StrengthSMP] v" + getDescription().getVersion() + " enabled.");
+        getLogger().info("\n\u001B[31m" + 
+                        "███████╗████████╗██████╗ ███████╗███╗   ██╗ ██████╗████████╗██╗  ██╗\r\n" + //
+                        "██╔════╝╚══██╔══╝██╔══██╗██╔════╝████╗  ██║██╔════╝╚══██╔══╝██║  ██║\r\n" + //
+                        "███████╗   ██║   ██████╔╝█████╗  ██╔██╗ ██║██║  ███╗  ██║   ███████║\r\n" + //
+                        "╚════██║   ██║   ██╔══██╗██╔══╝  ██║╚██╗██║██║   ██║  ██║   ██╔══██║\r\n" + //
+                        "███████║   ██║   ██║  ██║███████╗██║ ╚████║╚██████╔╝  ██║   ██║  ██║\r\n" + //
+                        "╚══════╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝ ╚═════╝   ╚═╝   ╚═╝  ╚═╝\r\n" + //
+                        "                                                                    \r\n" + //
+                        "                    ███████╗███╗   ███╗██████╗                      \r\n" + //
+                        "                    ██╔════╝████╗ ████║██╔══██╗                     \r\n" + //
+                        "                    ███████╗██╔████╔██║██████╔╝                     \r\n" + //
+                        "                    ╚════██║██║╚██╔╝██║██╔═══╝                      \r\n" + //
+                        "                    ███████║██║ ╚═╝ ██║██║                          \r\n" + //
+                        "                    ╚══════╝╚═╝     ╚═╝╚═╝                          \r\n" + //
+                        "                                                                    \u001B[0m");
+        getLogger().info("""
+                \u001B[35m
+                @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                @@@@@    @@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                @@@@@    @@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                @@@@@    @@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                @@@@@    @@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                @@@@@         @@@@@@@@@         @@@@@
+                @@@@@         @@@@@@@@@         @@@@@
+                @@@@@         @@@@@@@@@         @@@@@
+                @@@@@@@@@     @@@@@@@@@@@@@@@@@@@@@@@
+                @@@@@@@@@     @@@@@@@@@@@@@@@@@@@@@@@
+                @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                \u001B[0m
+                """);
+        getLogger().info("\n\u001B[33m"+
+                "╻ ╻┏━╸┏━┓     ╺┳╸╻ ╻╻┏━┓   ╻ ╻┏━┓┏━┓\r\n" + //
+                "┗┳┛┣╸ ┗━┓      ┃ ┣━┫┃┗━┓   ┃╻┃┣━┫┗━┓\r\n" + //
+                " ╹ ┗━╸┗━┛ ┛    ╹ ╹ ╹╹┗━┛   ┗┻┛╹ ╹┗━┛\r\n" + //
+                "┏━┓┏┓ ┏━┓┏━┓╻  ╻ ╻╺┳╸┏━╸╻  ╻ ╻      \r\n" + //
+                "┣━┫┣┻┓┗━┓┃ ┃┃  ┃ ┃ ┃ ┣╸ ┃  ┗┳┛      \r\n" + //
+                "╹ ╹┗━┛┗━┛┗━┛┗━╸┗━┛ ╹ ┗━╸┗━╸ ╹       \r\n" + //
+                "┏┓╻┏━╸┏━╸┏━╸┏━┓┏━┓┏━┓┏━┓╻ ╻         \r\n" + //
+                "┃┗┫┣╸ ┃  ┣╸ ┗━┓┗━┓┣━┫┣┳┛┗┳┛         \r\n" + //
+                "╹ ╹┗━╸┗━╸┗━╸┗━┛┗━┛╹ ╹╹┗╸ ╹          \u001B[0m");
+
+        registerRecipe(); // new part
     }
 }
