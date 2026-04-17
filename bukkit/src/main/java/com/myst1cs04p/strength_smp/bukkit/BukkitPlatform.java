@@ -51,6 +51,7 @@ public class BukkitPlatform implements StrengthPlatform {
 
         attribute.getModifiers().stream()
                 .filter(mod -> STRENGTH_MODIFIER_KEY.equals(mod.getKey()))
+                .toList()                              
                 .forEach(attribute::removeModifier);
 
         double bonus = (double) strengthLevel * damageMultiplier;
@@ -74,6 +75,7 @@ public class BukkitPlatform implements StrengthPlatform {
 
         attribute.getModifiers().stream()
                 .filter(mod -> STRENGTH_MODIFIER_KEY.equals(mod.getKey()))
+                .toList()
                 .forEach(attribute::removeModifier);
     }
 
