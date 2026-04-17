@@ -6,6 +6,7 @@ import com.myst1cs04p.strength_smp.common.platform.StrengthPlatform;
 import com.myst1cs04p.strength_smp.common.platform.StrengthStorage;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -50,14 +51,17 @@ public class StrengthEngine {
     // -----------------------------------------------------------------------
 
     /**
-     * Preload a player's strength from storage into the in-memory cache.
-     * Call this on player join so getStrength() never hits disk mid-play.
+     * Preload a player's strength from storage and apply their damage modifier.
+     * Call this on player join.
      */
     public void load(StrengthPlayer player) {
         if (!cache.containsKey(player.getUniqueId())) {
             int value = storage.load(player.getUniqueId());
             cache.put(player.getUniqueId(), value);
         }
+        // Always re-apply the modifier on join — covers the case where the
+        // plugin was reloaded or the player rejoined after a crash.
+        platform.applyDamageModifier(player, cache.get(player.getUniqueId()), config.getDamageMultiplier());
     }
 
     /**
@@ -68,14 +72,28 @@ public class StrengthEngine {
     }
 
     /**
-     * Persist and evict a single player from the cache.
-     * Call this on player quit to ensure data is safe between sessions.
+     * Strip the strength modifier from every online player.
+     * Call this in onDisable BEFORE saveAll so attributes are clean if the
+     * plugin is removed from the server between restarts.
+     */
+    public void removeAllModifiers(List<StrengthPlayer> onlinePlayers) {
+        for (StrengthPlayer player : onlinePlayers) {
+            platform.removeDamageModifier(player);
+        }
+    }
+
+    /**
+     * Persist, strip the modifier, and evict a single player from the cache.
+     * Call this on player quit.
      */
     public void flushPlayer(StrengthPlayer player) {
         Integer value = cache.remove(player.getUniqueId());
         if (value != null) {
             storage.save(player.getUniqueId(), value);
         }
+        // Remove the modifier regardless — if they rejoin while the plugin
+        // is still loaded, load() will re-apply it.
+        platform.removeDamageModifier(player);
     }
 
     // -----------------------------------------------------------------------

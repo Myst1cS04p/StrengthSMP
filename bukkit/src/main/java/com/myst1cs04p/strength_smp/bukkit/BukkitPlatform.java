@@ -64,6 +64,20 @@ public class BukkitPlatform implements StrengthPlatform {
     }
 
     @Override
+    public void removeDamageModifier(StrengthPlayer player) {
+        Player bukkit = unwrap(player);
+        if (bukkit == null) return;
+        if (ATTACK_DAMAGE == null) return;
+
+        AttributeInstance attribute = bukkit.getAttribute(ATTACK_DAMAGE);
+        if (attribute == null) return;
+
+        attribute.getModifiers().stream()
+                .filter(mod -> STRENGTH_MODIFIER_KEY.equals(mod.getKey()))
+                .forEach(attribute::removeModifier);
+    }
+
+    @Override
     public void dropStrengthToken(StrengthPlayer player, int amount) {
         Player bukkit = unwrap(player);
         if (bukkit == null) return;

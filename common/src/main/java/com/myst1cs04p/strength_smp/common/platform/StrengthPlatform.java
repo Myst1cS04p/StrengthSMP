@@ -15,6 +15,13 @@ public interface StrengthPlatform {
     void applyDamageModifier(StrengthPlayer player, int strengthLevel, float damageMultiplier);
 
     /**
+     * Strip the strength attack damage modifier from this player entirely.
+     * Called on player quit and server shutdown so no modifier persists
+     * after the plugin is removed from the server.
+     */
+    void removeDamageModifier(StrengthPlayer player);
+
+    /**
      * Drop {@code amount} strength tokens at the given player's current location.
      * Used when a killer is already at max strength.
      */

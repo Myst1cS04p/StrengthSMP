@@ -98,7 +98,15 @@ public class BukkitMain extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (engine != null) engine.saveAll();
+        if (engine != null) {
+            // Strip modifiers from all online players first so attributes don't
+            // persist if the plugin is removed between restarts.
+            List<StrengthPlayer> online = Bukkit.getOnlinePlayers().stream()
+                    .map(this::wrap)
+                    .collect(java.util.stream.Collectors.toList());
+            engine.removeAllModifiers(online);
+            engine.saveAll();
+        }
         if (platform != null) platform.close();
     }
 
