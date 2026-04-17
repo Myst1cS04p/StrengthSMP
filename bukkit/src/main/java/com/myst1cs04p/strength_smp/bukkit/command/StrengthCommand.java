@@ -3,6 +3,7 @@ package com.myst1cs04p.strength_smp.bukkit.command;
 import com.myst1cs04p.strength_smp.bukkit.BukkitStrengthPlayer;
 import com.myst1cs04p.strength_smp.common.command.StrengthCommandLogic;
 import com.myst1cs04p.strength_smp.common.model.StrengthPlayer;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
@@ -15,25 +16,22 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
-/**
- * Bukkit glue layer for the /strength command.
- * Converts Bukkit types -> common types, delegates everything to {@link StrengthCommandLogic},
- * then handles console output (which needs a plain-text path since console isn't a StrengthPlayer).
- */
 public class StrengthCommand implements CommandExecutor, TabCompleter {
 
     private final StrengthCommandLogic logic;
+    private final BukkitAudiences audiences;
 
-    public StrengthCommand(StrengthCommandLogic logic) {
+    public StrengthCommand(StrengthCommandLogic logic, BukkitAudiences audiences) {
         this.logic = logic;
+        this.audiences = audiences;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player player) {
-            logic.execute(new BukkitStrengthPlayer(player), false, label, args);
+            logic.execute(new BukkitStrengthPlayer(player, audiences), false, label, args);
         } else {
             logic.execute(new ConsoleSenderAdapter(sender), true, label, args);
         }
@@ -46,11 +44,9 @@ public class StrengthCommand implements CommandExecutor, TabCompleter {
             List<String> subs = new ArrayList<>(List.of("get", "withdraw", "help", "version"));
             if (sender.hasPermission("strength.set"))    subs.add("set");
             if (sender.hasPermission("strength.reload")) subs.add("reload");
-
             String partial = args[0].toLowerCase();
             return subs.stream().filter(s -> s.startsWith(partial)).toList();
         }
-
         if (args.length == 2) {
             String sub = args[0].toLowerCase();
             boolean isGet = sub.equals("get") && sender.hasPermission("strength.get");
@@ -61,40 +57,16 @@ public class StrengthCommand implements CommandExecutor, TabCompleter {
                 return names;
             }
         }
-
         return Collections.emptyList();
     }
 
-    // -----------------------------------------------------------------------
-    // Console adapter - wraps CommandSender as a StrengthPlayer so common logic
-    // can call sendMessage on it uniformly.
-    // -----------------------------------------------------------------------
-
     private record ConsoleSenderAdapter(CommandSender sender) implements StrengthPlayer {
-
-        @Override
-        public java.util.UUID getUniqueId() {
-            return new java.util.UUID(0, 0); 
-        }
-
-        @Override
-        public String getName() {
-            return "CONSOLE";
-        }
-
-        @Override
-        public void sendMessage(Component message) {
+        @Override public UUID getUniqueId() { return new UUID(0, 0); }
+        @Override public String getName() { return "CONSOLE"; }
+        @Override public void sendMessage(Component message) {
             sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(message));
         }
-
-        @Override
-        public boolean hasPermission(String permission) {
-            return sender.hasPermission(permission);
-        }
-
-        @Override
-        public boolean isOp() {
-            return true;
-        }
+        @Override public boolean hasPermission(String permission) { return sender.hasPermission(permission); }
+        @Override public boolean isOp() { return true; }
     }
 }

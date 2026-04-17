@@ -1,8 +1,5 @@
 package com.myst1cs04p.strength_smp.bukkit;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -11,14 +8,13 @@ import java.util.List;
 
 /**
  * Factory and identity check for the Strength Token ItemStack.
- * Lives in bukkit since it directly creates Bukkit ItemStack objects.
+ * Uses legacy string display names since Spigot's ItemMeta does not expose
+ * Adventure Component methods — Paper does, but we need Spigot compatibility here.
  */
 public final class StrengthItem {
 
-    private static final Component DISPLAY_NAME = Component.text("Strength Token")
-            .color(TextColor.color(255, 85, 85))
-            .decoration(TextDecoration.BOLD, true)
-            .decoration(TextDecoration.ITALIC, false);
+    /** Sentinel value used to identify strength tokens. Must be stable. */
+    private static final String DISPLAY_NAME = "\u00a7c\u00a7lStrength Token";
 
     private StrengthItem() {}
 
@@ -27,12 +23,8 @@ public final class StrengthItem {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return item;
 
-        meta.displayName(DISPLAY_NAME);
-        meta.lore(List.of(
-                Component.text("Right-click to absorb strength.")
-                        .color(TextColor.color(255, 0, 0))
-                        .decoration(TextDecoration.ITALIC, false)));
-
+        meta.setDisplayName(DISPLAY_NAME);
+        meta.setLore(List.of("\u00a7cRight-click to absorb strength."));
         item.setItemMeta(meta);
         return item;
     }
@@ -40,10 +32,7 @@ public final class StrengthItem {
     public static boolean isStrengthToken(ItemStack item) {
         if (item == null || item.getType() != Material.BLAZE_POWDER) return false;
         if (!item.hasItemMeta()) return false;
-
         ItemMeta meta = item.getItemMeta();
-        if (!meta.hasDisplayName()) return false;
-
-        return DISPLAY_NAME.equals(meta.displayName());
+        return meta.hasDisplayName() && DISPLAY_NAME.equals(meta.getDisplayName());
     }
 }

@@ -6,7 +6,7 @@ subprojects {
     apply(plugin = "java")
 
     group = "com.myst1cs04p.strength_smp"
-    version = "1.1.0"
+    version = "1.1.1"
 
     java {
         sourceCompatibility = JavaVersion.VERSION_21

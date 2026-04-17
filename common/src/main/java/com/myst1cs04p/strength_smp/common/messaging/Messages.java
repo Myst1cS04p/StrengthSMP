@@ -120,6 +120,11 @@ public final class Messages {
         return Component.text("Strength plugin reloaded.", NamedTextColor.GREEN);
     }
 
+    public static Component usageGet(String label) {
+        return Component.text("Usage: /" + label + " get <player>", NamedTextColor.RED);
+    }
+
+
     // -----------------------------------------------------------------------
     // Version / update nag
     // -----------------------------------------------------------------------

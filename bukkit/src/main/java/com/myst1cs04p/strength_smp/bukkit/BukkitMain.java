@@ -11,6 +11,7 @@ import com.myst1cs04p.strength_smp.common.command.StrengthCommandLogic;
 import com.myst1cs04p.strength_smp.common.engine.StrengthConfig;
 import com.myst1cs04p.strength_smp.common.engine.StrengthEngine;
 import com.myst1cs04p.strength_smp.common.updater.VersionNotifier;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -26,6 +27,7 @@ public class BukkitMain extends JavaPlugin {
 
     protected StrengthEngine engine;
     protected VersionNotifier versionNotifier;
+    public BukkitAudiences audiences;
 
     private BukkitConfigLoader configLoader;
     private BukkitStorage storage;
@@ -36,9 +38,10 @@ public class BukkitMain extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
 
-        configLoader   = new BukkitConfigLoader(this);
-        storage        = new BukkitStorage(this);
-        platform       = new BukkitPlatform(this);
+        configLoader = new BukkitConfigLoader(this);
+        storage      = new BukkitStorage(this);
+        platform     = new BukkitPlatform(this);
+        audiences    = platform.getAudiences();
 
         StrengthConfig config = configLoader.load();
 
@@ -46,29 +49,19 @@ public class BukkitMain extends JavaPlugin {
 
         engine = new StrengthEngine(storage, platform, metrics, config);
 
-        // Load any pre-existing data from strength.yml into the cache
+        // Pre-load already-online players (relevant on reload)
         for (Player online : Bukkit.getOnlinePlayers()) {
-            engine.load(new BukkitStrengthPlayer(online));
+            engine.load(wrap(online));
         }
 
         // Commands
-        StrengthCommandLogic logic = new StrengthCommandLogic(
-            engine,
-            getDescription().getVersion(),
-            name -> Optional.ofNullable(Bukkit.getPlayer(name)).map(BukkitStrengthPlayer::new),
-            this::performReload
-        );
-        StrengthCommand command = new StrengthCommand(logic);
-        if (getCommand("strength") != null) {
-            getCommand("strength").setExecutor(command);
-            getCommand("strength").setTabCompleter(command);
-        }
+        registerCommands();
 
         // Events
         var pm = getServer().getPluginManager();
-        pm.registerEvents(new PlayerConnectionListener(engine), this);
-        pm.registerEvents(new StrengthListener(engine), this);
-        pm.registerEvents(new StrengthItemListener(engine), this);
+        pm.registerEvents(new PlayerConnectionListener(engine, this), this);
+        pm.registerEvents(new StrengthListener(engine, this), this);
+        pm.registerEvents(new StrengthItemListener(engine, this), this);
 
         // Recipe
         recipeRegistrar = new RecipeRegistrar(this);
@@ -82,19 +75,43 @@ public class BukkitMain extends JavaPlugin {
             getDescription().getVersion(),
             platform
         );
-        pm.registerEvents(new AdminJoinListener(versionNotifier), this);
+        pm.registerEvents(new AdminJoinListener(versionNotifier, audiences), this);
         startUpdateScheduler();
 
         printBanner();
     }
 
+    protected void registerCommands() {
+        StrengthCommandLogic logic = new StrengthCommandLogic(
+            engine,
+            getDescription().getVersion(),
+            name -> Optional.ofNullable(Bukkit.getPlayer(name)).map(this::wrap),
+            this::performReload
+        );
+        StrengthCommand command = new StrengthCommand(logic, audiences);
+        if (getCommand("strength") != null) {
+            getCommand("strength").setExecutor(command);
+            getCommand("strength").setTabCompleter(command);
+        }
+    }
+
+
     @Override
     public void onDisable() {
         if (engine != null) engine.saveAll();
+        if (platform != null) platform.close();
     }
 
     // -----------------------------------------------------------------------
-    // Reload (called by command logic via lambda)
+    // Helper
+    // -----------------------------------------------------------------------
+
+    public BukkitStrengthPlayer wrap(Player player) {
+        return new BukkitStrengthPlayer(player, audiences);
+    }
+
+    // -----------------------------------------------------------------------
+    // Reload
     // -----------------------------------------------------------------------
 
     protected void performReload() {
@@ -109,13 +126,10 @@ public class BukkitMain extends JavaPlugin {
     // Scheduler hook
     // -----------------------------------------------------------------------
 
-    /**
-     * Start the version update scheduler.
-     * Overridden by {@code PaperMain} to use Paper's async scheduler instead.
-     */
     protected void startUpdateScheduler() {
         new BukkitUpdateScheduler(this, versionNotifier).start();
     }
+
 
     // -----------------------------------------------------------------------
     // ASCII banner
@@ -162,7 +176,5 @@ public class BukkitMain extends JavaPlugin {
                 "┏┓╻┏━╸┏━╸┏━╸┏━┓┏━┓┏━┓┏━┓╻ ╻         \r\n" + //
                 "┃┗┫┣╸ ┃  ┣╸ ┗━┓┗━┓┣━┫┣┳┛┗┳┛         \r\n" + //
                 "╹ ╹┗━╸┗━╸┗━╸┗━┛┗━┛╹ ╹╹┗╸ ╹          \u001B[0m");
-
-        registerRecipe(); // new part
     }
 }

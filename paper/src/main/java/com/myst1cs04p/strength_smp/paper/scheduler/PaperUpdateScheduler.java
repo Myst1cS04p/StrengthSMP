@@ -42,8 +42,12 @@ public class PaperUpdateScheduler {
      * Cancel the task cleanly on plugin disable.
      */
     public void stop() {
-        if (task instanceof io.papermc.paper.scheduler.ScheduledTask scheduledTask) {
-            scheduledTask.cancel();
+        // task is a ScheduledTask but we avoid importing the type directly
+        // to stay compatible with both Paper and non-Folia builds
+        if (task != null) {
+            try {
+                task.getClass().getMethod("cancel").invoke(task);
+            } catch (Exception ignored) {}
         }
     }
 }

@@ -7,7 +7,6 @@ commands:
   strength:
     description: View or manage strength
     aliases: [ str ]
-    usage: /<command> <get|set|withdraw|reload|help|version>
 
 permissions:
   strength.set:

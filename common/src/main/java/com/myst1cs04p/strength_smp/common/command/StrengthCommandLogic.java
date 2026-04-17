@@ -11,19 +11,19 @@ import java.util.function.Function;
 /**
  * Pure command logic with zero Minecraft coupling.
  *
- * The bukkit layer's CommandExecutor delegates straight to this class.
- * Player lookup ({@code playerResolver}) is injected so this class never calls
- * Bukkit.getPlayer() itself = it receives a lambda that does it.
+ * The bukkit layer's CommandExecutor and the Paper Brigadier commands both
+ * delegate to this class. Player lookup ({@code playerResolver}) is injected
+ * so this class never calls Bukkit.getPlayer() itself.
  */
 public class StrengthCommandLogic {
 
     private final StrengthEngine engine;
     private final String pluginVersion;
 
-    /** Injected by the bukkit layer = resolves a name to an online StrengthPlayer, if present. */
+    /** Injected by the platform layer — resolves a name to an online StrengthPlayer, if present. */
     private final Function<String, Optional<StrengthPlayer>> playerResolver;
 
-    /** Injected by the bukkit layer = triggers config reload on the platform side. */
+    /** Injected by the platform layer — triggers config reload on the platform side. */
     private final Runnable reloadCallback;
 
     public StrengthCommandLogic(
@@ -38,11 +38,12 @@ public class StrengthCommandLogic {
     }
 
     /**
-     * Execute a strength command.
+     * Execute a strength command. Used by the Bukkit CommandExecutor path.
      *
-     * @param sender  the player or console issuing the command (null = console)
-     * @param label   the command alias used (for usage strings)
-     * @param args    command arguments
+     * @param sender          the player or console issuing the command
+     * @param isConsoleSender true when the sender is not a player
+     * @param label           the command alias used (for usage strings)
+     * @param args            command arguments
      */
     public void execute(StrengthPlayer sender, boolean isConsoleSender, String label, String[] args) {
 
@@ -57,28 +58,21 @@ public class StrengthCommandLogic {
         }
 
         switch (args[0].toLowerCase()) {
-
-            case "help" -> handleHelp(sender, label);
-
-            case "get" -> handleGet(sender, isConsoleSender, label, args);
-
-            case "set" -> handleSet(sender, label, args);
-
-            case "withdraw" -> handleWithdraw(sender, isConsoleSender, label, args);
-
-            case "reload" -> handleReload(sender);
-
-            case "version", "ver" -> sendMessage(sender, Messages.version(pluginVersion));
-
-            default -> sendMessage(sender, Messages.unknownSubcommand());
+            case "help"              -> handleHelp(sender, label);
+            case "get"               -> handleGet(sender, isConsoleSender, label, args);
+            case "set"               -> handleSet(sender, label, args);
+            case "withdraw"          -> handleWithdraw(sender, isConsoleSender, label, args);
+            case "reload"            -> handleReload(sender);
+            case "version", "ver"    -> sendMessage(sender, Messages.version(pluginVersion));
+            default                  -> sendMessage(sender, Messages.unknownSubcommand());
         }
     }
 
     // -----------------------------------------------------------------------
-    // Subcommand handlers
+    // Public subcommand entry points (called directly by Paper Brigadier commands)
     // -----------------------------------------------------------------------
 
-    private void handleHelp(StrengthPlayer sender, String label) {
+    public void handleHelp(StrengthPlayer sender, String label) {
         sendMessage(sender, Messages.helpHeader());
         sendMessage(sender, Messages.helpLine(label, "", "show your strength"));
 
@@ -95,10 +89,10 @@ public class StrengthCommandLogic {
         sendMessage(sender, Messages.helpLine(label, "version", "display the plugin version"));
     }
 
-    private void handleGet(StrengthPlayer sender, boolean isConsoleSender, String label, String[] args) {
+    public void handleGet(StrengthPlayer sender, boolean isConsoleSender, String label, String[] args) {
         if (args.length == 1) {
             if (isConsoleSender) {
-                sendMessage(sender, Messages.consoleOnly());
+                sendMessage(sender, Messages.usageGet(label));
                 return;
             }
             sendMessage(sender, Messages.yourStrength(engine.getStrength(sender)));
@@ -119,7 +113,7 @@ public class StrengthCommandLogic {
         sendMessage(sender, Messages.targetStrength(target.get().getName(), engine.getStrength(target.get())));
     }
 
-    private void handleSet(StrengthPlayer sender, String label, String[] args) {
+    public void handleSet(StrengthPlayer sender, String label, String[] args) {
         if (sender != null && !sender.hasPermission("strength.set")) {
             sendMessage(sender, Messages.noPermission());
             return;
@@ -149,7 +143,7 @@ public class StrengthCommandLogic {
         target.get().sendMessage(Messages.yourStrengthWasSet(amount));
     }
 
-    private void handleWithdraw(StrengthPlayer sender, boolean isConsoleSender, String label, String[] args) {
+    public void handleWithdraw(StrengthPlayer sender, boolean isConsoleSender, String label, String[] args) {
         if (isConsoleSender) {
             sendMessage(sender, Messages.playerOnly());
             return;
@@ -170,13 +164,13 @@ public class StrengthCommandLogic {
 
         StrengthEngine.WithdrawResult result = engine.withdraw(sender, amount);
         switch (result) {
-            case SUCCESS -> sendMessage(sender, Messages.withdrew(amount));
-            case INVALID_AMOUNT -> sendMessage(sender, Messages.invalidWithdrawAmount());
+            case SUCCESS             -> sendMessage(sender, Messages.withdrew(amount));
+            case INVALID_AMOUNT      -> sendMessage(sender, Messages.invalidWithdrawAmount());
             case INSUFFICIENT_STRENGTH -> sendMessage(sender, Messages.notEnoughStrength());
         }
     }
 
-    private void handleReload(StrengthPlayer sender) {
+    public void handleReload(StrengthPlayer sender) {
         if (sender != null && !sender.hasPermission("strength.reload")) {
             sendMessage(sender, Messages.noPermission());
             return;
@@ -185,19 +179,17 @@ public class StrengthCommandLogic {
         sendMessage(sender, Messages.reloadSuccess());
     }
 
+    public void handleVersion(StrengthPlayer sender) {
+        sendMessage(sender, Messages.version(pluginVersion));
+    }
+
     // -----------------------------------------------------------------------
     // Internal helpers
     // -----------------------------------------------------------------------
 
-    /**
-     * Send a message to the sender. If sender is null (console), the platform
-     * layer's console logger is used instead = but that path is handled by
-     * the bukkit CommandExecutor wrapper before it reaches here.
-     */
     private void sendMessage(StrengthPlayer sender, Component message) {
         if (sender != null) {
             sender.sendMessage(message);
         }
-        // Console path: the bukkit CommandExecutor casts/logs on its own side
     }
 }

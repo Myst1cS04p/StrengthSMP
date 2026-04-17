@@ -6,7 +6,6 @@ strength-item:
   enabled: true
   recipe:
     key: strength_token
-    # 3x3 shape 
     shape:
       - "ABA"
       - "BCB"

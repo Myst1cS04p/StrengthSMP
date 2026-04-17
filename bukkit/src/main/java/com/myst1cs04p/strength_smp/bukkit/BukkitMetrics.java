@@ -3,7 +3,6 @@ package com.myst1cs04p.strength_smp.bukkit;
 import com.myst1cs04p.strength_smp.common.platform.StrengthMetrics;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.AdvancedPie;
-import org.bstats.charts.SimplePie;
 import org.bstats.charts.SingleLineChart;
 import org.bukkit.plugin.java.JavaPlugin;
 

@@ -1,4 +1,4 @@
-import com.gradleup.shadow.tasks.ShadowJar
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     java
@@ -13,10 +13,11 @@ dependencies {
     implementation(project(":bukkit"))
 
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
+
     compileOnly("net.kyori:adventure-api:4.17.0")
 }
 
-tasks.named<ShadowJar>("shadowJar") {
+tasks.withType<ShadowJar> {
     archiveClassifier.set("")
     archiveBaseName.set("strengthsmp-paper")
 
@@ -31,6 +32,12 @@ tasks.named<ShadowJar>("shadowJar") {
     mergeServiceFiles()
 }
 
+tasks.processResources {
+    filesMatching("*.yml") {
+        expand("version" to project.version)
+    }
+}
+
 tasks.build {
-    dependsOn(tasks.shadowJar)
+    dependsOn(tasks.withType<ShadowJar>())
 }

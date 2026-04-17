@@ -67,6 +67,17 @@ public class StrengthEngine {
         storage.saveAll(Map.copyOf(cache));
     }
 
+    /**
+     * Persist and evict a single player from the cache.
+     * Call this on player quit to ensure data is safe between sessions.
+     */
+    public void flushPlayer(StrengthPlayer player) {
+        Integer value = cache.remove(player.getUniqueId());
+        if (value != null) {
+            storage.save(player.getUniqueId(), value);
+        }
+    }
+
     // -----------------------------------------------------------------------
     // Strength reads
     // -----------------------------------------------------------------------
@@ -116,7 +127,7 @@ public class StrengthEngine {
         int victimStrength = getStrength(victim);
 
         if (victimStrength <= config.getMinStrength()) {
-            // Victim has nothing left to give - killer still gets nothing
+            // Victim has nothing left to give so killer gets nothing
             return;
         }
 
