@@ -6,33 +6,23 @@
 - Killing another player increases your strength.
 - Dying to another player decreases it.
 - Both limits (min/max) are fully configurable.
+- Killing a player at max strength drops a strength token instead of wasting the strength.
 
 ## Damage Multiplier System
 - Strength is applied as a **total damage multiplier**, not a flat bonus.
 - This can be configured in the `config.yml` file.
-
-## Persistence
-- Strength values save automatically to disk and reload on startup.
-- No database setup. Simple `.yml` file.
 
 ## Craftable Strength Tokens
 - Configurable 3×3 recipe via `config.yml`.
 - Uses Bukkit’s recipe system (**no client mods required**).
 - Tokens are consumable with right-click to permanently gain +1 Strength.
 
-## Overflow Rewards
-- Killing a player at max strength drops a strength token instead of wasting the strength.
-
-## Commands for mortals and gods
+## Commands
 - `/strength get` - See your current strength level.
 - `/strength set <player> <amount>` - (OP only) Manually set someone’s strength.
 - `/strength withdraw <amount>` - Convert part of your strength into tradable tokens.
 - `/strength reload` - Reload config without restarting.
 - `/strength version` - Displays plugin version.
-
-## Offline tracking
-- Player data persists even when they’re offline.
-- No resets between restarts unless you delete the data file yourself.
 
 ## Custom crafting
 Recipe shape and materials configurable in `config.yml`.
