@@ -29,11 +29,15 @@ public class BukkitPlatform implements StrengthPlatform {
 
     private static final NamespacedKey STRENGTH_MODIFIER_KEY =
             new NamespacedKey("strengthsmp", "strength_modifier");
+    private static final Attribute ATTACK_DAMAGE = resolveAttackDamage();
 
-    // Looked up once at construction time via the registry — safe on 1.21.4+.
-    private static final Attribute ATTACK_DAMAGE =
-            Registry.ATTRIBUTE.get(NamespacedKey.minecraft("generic.attack_damage"));
-
+    private static Attribute resolveAttackDamage() {
+        // 1.21.1 and below use "generic.attack_damage"
+        Attribute a = Registry.ATTRIBUTE.get(NamespacedKey.minecraft("generic.attack_damage"));
+        if (a != null) return a;
+        // 1.21.2+ renamed it to just "attack_damage"
+        return Registry.ATTRIBUTE.get(NamespacedKey.minecraft("attack_damage"));
+    }
     private final BukkitAudiences audiences;
 
     public BukkitPlatform(JavaPlugin plugin) {

@@ -128,6 +128,10 @@ public class BukkitMain extends JavaPlugin {
         storage.reload();
         StrengthConfig newConfig = configLoader.load();
         engine.reloadConfig(newConfig);
+        // Re-apply modifiers with the new config for all currently online players
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            engine.load(wrap(online));
+        }
         recipeRegistrar.register(newConfig);
         getLogger().info("[StrengthSMP] Config reloaded.");
     }
